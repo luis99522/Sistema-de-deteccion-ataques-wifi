@@ -26,7 +26,7 @@ pip install scapy pandas scikit-learn joblib numpy colorama
 
 Instalación:
 bash# Clonar repositorio
-git clone 
+git clone https://github.com/luis99522/Sistema-de-deteccion-ataques-wifi/tree/main
 cd cybersen-detector
 
 # Instalar dependencias
