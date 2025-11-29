@@ -26,7 +26,7 @@ pip install scapy pandas scikit-learn joblib numpy colorama
 
 Instalación:
 bash# Clonar repositorio
-git clone https://github.com/tu-usuario/cybersen-detector.git
+git clone 
 cd cybersen-detector
 
 # Instalar dependencias
