@@ -115,26 +115,7 @@ Error: Interfaz no está en modo monitor → Revisa configuración con iwconfig 
 
 Error: Solo detecta “normal” → Necesitas capturar ataques reales y reentrenar el modelo.
 
-Ejemplo de salida:
-
-🛡️ CYBERSEN DETECTOR ACTIVADO
-📡 Escuchando: wlan0
-🎯 Detectando: Deauth, Beacon Flood, Rogue AP
-
-✓ Paquetes analizados: 1500
-🚨 Alertas de seguridad: 1
-🛡️ Falsos positivos filtrados: 12
-⚡ Velocidad: 28.5 paquetes/seg
-
-📈 CLASIFICACIÓN DEL TRÁFICO:
-  ✅ normal        | ███████████ 1275 (85.0%)
-  🚨 deauth        | ██           150 (10.0%)
-  ⚠️ beacon_flood  | █             75 (5.0%)
-
-🚨 ¡ALERTA DE SEGURIDAD!
-ATAQUE DEAUTH detectado
-Dispositivo atacante: AA:BB:CC:DD:EE:FF
-Certeza: 92%
+Si es que hay errores de instalacion de las librerias de python ejecuta el proyecto en un entorno virtual.  
 
 Autor: 
 Ghostblade
