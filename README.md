@@ -75,21 +75,6 @@ python3 model/train_model.py
 7. Detección en tiempo real:
 sudo python3 detection/realtime_detector.py
 
-Estructura del proyecto:
-
-cybersen-detector/
-├── requirements.txt
-├── capture/
-│   └── capture_script.py
-├── features/
-│   ├── extract_features.py
-│   └── build_dataset.py
-├── model/
-│   └── train_model.py
-├── detection/
-│   └── realtime_detector.py
-└── data/
-
 Nombres de archivo soportados:
 Para que el etiquetado automático funcione, usa estos nombres:
 
