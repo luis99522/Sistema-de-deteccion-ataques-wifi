@@ -1,111 +1,115 @@
-CyberSen Detector
-Sistema de Detección de Intrusiones WiFi con Machine Learning que identifica ataques en tiempo real mediante análisis pasivo de tramas 802.11.
+Proyecto cybersen detector: 
 
-¿Qué Detecta?
+Sistema de Detección de Intrusiones WiFi con Machine Learning Detecta ataques en tiempo real mediante el análisis pasivo de tramas 802.11.
 
-Deauth Attack: Desconexión forzada de dispositivos
-Beacon Flood: Inundación de redes WiFi falsas
-Rogue AP: Puntos de acceso maliciosos
+¿Qué puede detectar?
+Deauth Attack → Intentos de desconectar forzosamente dispositivos de la red.
+
+Beacon Flood → Inundación de redes falsas para confundir a los usuarios.
+
+Rogue AP → Puntos de acceso maliciosos que imitan redes legítimas.
 
 Requisitos
 Hardware
+Tarjeta WiFi compatible con modo monitor (ejemplo: Alfa AWUS036ACH, chipsets Atheros/Ralink).
 
-Tarjeta WiFi compatible con modo monitor (ej: Alfa AWUS036ACH, chipset Atheros/Ralink)
-Laptop con Linux (Ubuntu, Kali, Parrot, etc.)
+Laptop con Linux (Ubuntu, Kali, Parrot, etc.).
 
 Software
-bash# Sistema operativo
-Linux (cualquier distribución)
+Sistema operativo: Cualquier distribución Linux.
 
-# Herramientas
+Herramientas necesarias:
 sudo apt update
 sudo apt install aircrack-ng python3 python3-pip
 
-# Dependencias Python
+Dependencias de Python:
 pip install scapy pandas scikit-learn joblib numpy colorama
 
-Instalación:
-bash# Clonar repositorio
+Instalación
+Clona el repositorio:
 git clone https://github.com/luis99522/Sistema-de-deteccion-ataques-wifi/tree/main
 cd cybersen-detector
 
-# Instalar dependencias
+Instala dependencias:
 pip install -r requirements.txt
 
-# Configurar interfaz en modo monitor
+Configura tu tarjeta en modo monitor:
 sudo ip link set wlan0 down
 sudo iwconfig wlan0 mode monitor
-sudo ip link set wlan0 up
+sudo ip link set wlan0 up 
 
-Uso Rápido:
-Opción 1: Launcher Automático (Recomendado)
-bashsudo python3 launcher.py
-# Seleccionar [1] Pipeline Completo
-Opción 2: Ejecución Manual Paso a Paso
-Paso 1: Capturar Tráfico
-bash# Captura de tráfico NORMAL (2-3 minutos)
+Estos son los pasos para ejecutar la herramienta: 
+
+1. Captura de tráfico normal (2-3 min):
 sudo python3 capture/capture_script.py --duration 180
 mv data/capture.pcap data/trafico_normal_1.pcap
 
-# Captura de ATAQUE DEAUTH
-# Terminal 1: Lanzar ataque contra TU red
+2. Captura durante ataque Deauth:
+Terminal 1:
 sudo aireplay-ng -0 50 -a [TU_BSSID] wlan1
 
-# Terminal 2: Capturar durante el ataque
+Terminal 2:
 sudo python3 capture/capture_script.py --duration 60
 mv data/capture.pcap data/trafico_deauth.pcap
 
-# Captura de BEACON FLOOD (opcional)
-# Terminal 1:
+3. Captura Beacon Flood (opcional): Aunque seria conveniente para tener un model mejor entrenado
+
+Terminal 1:
 sudo mdk4 wlan1 b -f /tmp/ap_list.txt
-# Terminal 2:
+
+Terminal 2:
 sudo python3 capture/capture_script.py --duration 60
-mv data/capture.pcap data/trafico_beacon_flood.pcap
-Paso 2: Extraer Características
-bashpython3 features/extract_features.py
-# Genera: *_dataset.csv por cada .pcap
-Paso 3: Construir Dataset
-bashpython3 features/build_dataset.py
-# Genera: final_dataset.csv (dataset consolidado y balanceado)
-Paso 4: Entrenar Modelo
-bashpython3 model/train_model.py
-# Genera: model.pkl (modelo entrenado)
-Paso 5: Detectar en Tiempo Real
-bashsudo python3 detection/realtime_detector.py
-# Inicia detección 24/7
+mv data/capture.pcap data/trafico_beacon_flood.pcap 
 
-Estructura del Proyecto:
+Tambien podrias hacer el mismo procedimiento pero con ataques de rogue AP para que el modelo detecte mas ataques. 
+
+4. Extraer características:
+python3 features/extract_features.py
+
+5. Construir dataset:
+python3 features/build_dataset.py
+
+6. Entrenar modelo:
+python3 model/train_model.py
+
+7. Detección en tiempo real:
+sudo python3 detection/realtime_detector.py
+
+Estructura del proyecto:
+
 cybersen-detector/
-├── requirements.txt            # Dependencias Python
+├── requirements.txt
 ├── capture/
-│   └── capture_script.py      # Captura paquetes WiFi
+│   └── capture_script.py
 ├── features/
-│   ├── extract_features.py    # Extrae características
-│   └── build_dataset.py       # Consolida datasets
+│   ├── extract_features.py
+│   └── build_dataset.py
 ├── model/
-│   └── train_model.py         # Entrena modelo ML
+│   └── train_model.py
 ├── detection/
-│   └── realtime_detector.py   # Detección en tiempo real
-└── data/                       # Capturas y datasets (generado)
+│   └── realtime_detector.py
+└── data/
 
-Nombres de Archivo Soportados
-IMPORTANTE: Los archivos .pcap deben nombrarse así para etiquetado automático:
-bash✅ trafico_normal.pcap          # Tráfico normal (una captura)
-✅ trafico_normal_1.pcap        # Tráfico normal (primera captura)
-✅ trafico_normal_2.pcap        # Tráfico normal (segunda captura)
-   ... hasta trafico_normal_10.pcap
+Nombres de archivo soportados:
+Para que el etiquetado automático funcione, usa estos nombres:
 
-✅ trafico_deauth.pcap          # Ataque deauth
-✅ trafico_beacon_flood.pcap    # Ataque beacon flood
-✅ trafico_rogue_ap.pcap        # Ataque rogue AP
-⚙️ Configuración de Umbrales
-Si tienes muchos falsos positivos, edita detection/realtime_detector.py (línea ~91):
-pythonself.thresholds = {
+trafico_normal.pcap, trafico_normal_1.pcap, … hasta trafico_normal_10.pcap
+
+trafico_deauth.pcap
+
+trafico_beacon_flood.pcap
+
+trafico_rogue_ap.pcap
+
+Ajuste de umbrales
+Si recibes muchos falsos positivos, edita detection/realtime_detector.py
+
+self.thresholds = {
     'deauth': {
-        'min_predictions': 15,    # ⬆️ Aumentar para menos FP
-        'confidence': 0.82,       # ⬆️ Aumentar para más estricto
-        'cooldown': 60,           # Segundos entre alertas
-        'rate_threshold': 8       # Paquetes/segundo para confirmar
+        'min_predictions': 15,
+        'confidence': 0.82,
+        'cooldown': 60,
+        'rate_threshold': 8
     },
     'beacon_flood': {
         'min_predictions': 12,
@@ -114,67 +118,39 @@ pythonself.thresholds = {
         'rate_threshold': 30
     }
 }
-🐛 Troubleshooting
-Problema: "No se encontró model.pkl"
-bash# Solución: Entrena el modelo primero
+
+Troubleshooting
+Error: No se encontró model.pkl → Entrena el modelo:
+
 python3 model/train_model.py
-Problema: "Permission denied"
-bash# Solución: Ejecuta con sudo
-sudo python3 detection/realtime_detector.py
-Problema: "Interfaz no está en modo monitor"
-bash# Solución: Configura modo monitor
-sudo ip link set wlan0 down
-sudo iwconfig wlan0 mode monitor
-sudo ip link set wlan0 up
-iwconfig wlan0  # Verificar: debe decir "Mode:Monitor"
-Problema: "Solo detecta 'normal', no ataques"
-bash# Solución: Necesitas capturar ataques REALES
-# 1. Captura tráfico normal
-# 2. Simula ataques con aireplay-ng/mdk4
-# 3. Captura durante el ataque
-# 4. Re-entrena el modelo
-📊 Ejemplo de Salida
-🛡️  CYBERSEN DETECTOR ACTIVADO
-════════════════════════════════════════════════════
+
+Error: Permission denied → Ejecuta con sudo.
+
+Error: Interfaz no está en modo monitor → Revisa configuración con iwconfig wlan0.
+
+Error: Solo detecta “normal” → Necesitas capturar ataques reales y reentrenar el modelo.
+
+Ejemplo de salida:
+
+🛡️ CYBERSEN DETECTOR ACTIVADO
 📡 Escuchando: wlan0
 🎯 Detectando: Deauth, Beacon Flood, Rogue AP
-════════════════════════════════════════════════════
 
-📊 RESUMEN DE ACTIVIDAD
-────────────────────────────────────────────────────
 ✓ Paquetes analizados: 1500
 🚨 Alertas de seguridad: 1
-🛡️  Falsos positivos filtrados: 12
+🛡️ Falsos positivos filtrados: 12
 ⚡ Velocidad: 28.5 paquetes/seg
 
 📈 CLASIFICACIÓN DEL TRÁFICO:
-  ✅ normal          | ███████████  1275 (85.0%)
-  🚨 deauth          | ██            150 (10.0%)
-  ⚠️ beacon_flood    | █              75 (5.0%)
+  ✅ normal        | ███████████ 1275 (85.0%)
+  🚨 deauth        | ██           150 (10.0%)
+  ⚠️ beacon_flood  | █             75 (5.0%)
 
-🚨 ═══════════════════════════════════════════════
-║ ¡ALERTA DE SEGURIDAD!
-║ ATAQUE DEAUTH
-║ Intento de desconectar dispositivos de la red
-║ 
-║ 📍 Dispositivo atacante: AA:BB:CC:DD:EE:FF
-║ 🎯 Certeza: 92%
-═══════════════════════════════════════════════
-⚠️ Consideraciones Legales
+🚨 ¡ALERTA DE SEGURIDAD!
+ATAQUE DEAUTH detectado
+Dispositivo atacante: AA:BB:CC:DD:EE:FF
+Certeza: 92%
 
-✅ Usar en tu propia red: Legal
-✅ Usar con permiso escrito: Legal
-❌ Usar en redes ajenas sin permiso: ILEGAL
-
-Este proyecto es solo para fines educativos y de defensa. El uso indebido puede ser ilegal en tu país.
-🤝 Contribuciones
-Pull requests son bienvenidos. Para cambios importantes, abre un issue primero.
-
-👤 Autor
-ghostblade
-
-GitHub: @luis99522
-
-
-⭐ Si este proyecto te fue útil, dale una estrella en GitHub!
+Autor: 
+Ghostblade
 
